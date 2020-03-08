@@ -3,6 +3,8 @@
 #include <string.h>
 #include <time.h>
 
+static const char sourceArray[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
+
 int main (int argc, char* argv[]) {
 	int loopcounter;
 	int int_lengthVal = atoi(argv[1]);
