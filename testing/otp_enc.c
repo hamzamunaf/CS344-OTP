@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 	int socketFD, portNumber, charsWritten, charsRead;
 	struct sockaddr_in serverAddress;
 	struct hostent* serverHostInfo;
-	char buffer[256];
+	char keygen[256];
   char buffer2[256];
 
 	if (argc < 4) { fprintf(stderr,"USAGE: %s hostname port\n", argv[0]); exit(0); } // Check usage & args
@@ -33,13 +33,14 @@ int main(int argc, char *argv[])
 
 //File checking for key and will transfer key to see how it works
   FILE* file_pointer = fopen(argv[2], "r");
-  fgets(buffer, 256, file_pointer);
+  fgets(keygen, 256, file_pointer);
   fclose(file_pointer);
 
   FILE* file_pointer2 = fopen(argv[3], "r");
   fgets(buffer2, 256, file_pointer2);
   fclose(file_pointer2);
 
+// will do encryption here and then send it and decrypt it on the other side and see how that works 
 
 	memset((char*)&serverAddress, '\0', sizeof(serverAddress)); // Clear out the address struct
 	portNumber = atoi(argv[1]); // Get the port number, convert to an integer from a string
@@ -56,13 +57,6 @@ int main(int argc, char *argv[])
 	// Connect to server
 	if (connect(socketFD, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) // Connect socket to address
 		error("CLIENT: ERROR connecting");
-
-	// Get input message from user
-	// printf("CLIENT: Enter text to send to the server, and then hit enter: ");
-	// memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer array
-	// fgets(buffer, sizeof(buffer) - 1, stdin); // Get input from the user, trunc to buffer - 1 chars, leaving \0
-	// buffer[strcspn(buffer, "\n")] = '\0'; // Remove the trailing \n that fgets adds
-    // buffer=filereadfunction(argv[2]);
 
 	// Send message to server
 	charsWritten = send(socketFD, buffer2, strlen(buffer2), 0); // Write to the server
