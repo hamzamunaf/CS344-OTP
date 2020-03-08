@@ -40,7 +40,7 @@
  	listen(listenSocketFD, 5); // Flip the socket on - it can now receive up to 5 connections
 
 
-  while (1){
+  
  	// Accept a connection, blocking if one is not available until one connects
  	sizeOfClientInfo = sizeof(clientAddress); // Get the size of the address for the client that will connect
  	establishedConnectionFD = accept(listenSocketFD, (struct sockaddr *)&clientAddress, &sizeOfClientInfo); // Accept
@@ -56,8 +56,6 @@
  	charsRead = send(establishedConnectionFD, "I am the server, and I got your message", 39, 0); // Send success back
  	if (charsRead < 0) error("ERROR writing to socket");
  	close(establishedConnectionFD); // Close the existing socket which is connected to the client
-
-}
  	close(listenSocketFD); // Close the listening socket
  	return 0;
  }
