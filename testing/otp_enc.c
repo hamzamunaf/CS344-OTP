@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 
 
 	keygenlen=strlen(keygen);
-	printf(" key:  %s\n", keygen);
+	// printf(" key:  %s\n", keygen);
 // File for the plain text
   FILE* file_pointer2 = fopen(argv[1], "r");
   // fgets(enc_text, MAX_CHAR, file_pointer2);
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
   fclose(file_pointer2);
 	enc_text[strcspn(enc_text, "\n")] = '\0';
 	enc_textlen=strlen(enc_text);
-	printf(" Text:  %s\n", enc_text);
+	// printf(" Text:  %s\n", enc_text);
 // Note that the key passed in must be at least as big as the plaintext.
 	if (keygenlen < enc_textlen){
 		fprintf(stderr, "ERROR: Keygen is shorter than plain text\n");
@@ -111,7 +111,23 @@ int main(int argc, char *argv[])
 	if (connect(socketFD, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) // Connect socket to address
 		error("CLIENT: ERROR connecting");
 
+
+
+		// int number_to_send = 10000; // Put your value
+		// int converted_number = htonl(number_to_send);
+		// // Write the number to the opened socket
+		// write(client_socket, &converted_number, sizeof(converted_number));
 	// Send message to server
+	int converted_number=htonl(keygenlen);
+	charsWritten = send(socketFD, &converted_number, sizeof(converted_number), 0); // Write to the server
+	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
+	if (charsWritten < sizeof(converted_number)) printf("CLIENT: WARNING: Not all data written to socket!\n");
+
+	converted_number=htonl(enc_textlen);
+	charsWritten = send(socketFD, &converted_number, sizeof(converted_number), 0); // Write to the server
+	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
+	if (charsWritten < sizeof(converted_number)) printf("CLIENT: WARNING: Not all data written to socket!\n");
+
 	charsWritten = send(socketFD, keygen, strlen(keygen), 0); // Write to the server
 	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
 	if (charsWritten < strlen(keygen)) printf("CLIENT: WARNING: Not all data written to socket!\n");
