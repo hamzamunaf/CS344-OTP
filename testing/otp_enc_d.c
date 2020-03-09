@@ -6,16 +6,20 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+static const char BasicArray[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
+// encryption for client
+#define MAX_CHAR 80000
+#define BASICLEN 28
 // daemon server for encryption
-
+// This child process of otp_enc_d must first check to make sure it is communicating with otp_enc (see otp_enc, below). After verifying that the connection to otp_enc_d is coming from otp_enc, then this child receives from otp_enc plaintext and a key via the communication socket (not the original listen socket). The otp_enc_d child will then write back the ciphertext to the otp_enc process that it is connected to via the same communication socket. Note that the key passed in must be at least as big as the plaintext.
 void error(const char *msg) { perror(msg); exit(1); } // Error function used for reporting issues
 
 int main(int argc, char *argv[])
 {
 	int listenSocketFD, establishedConnectionFD, portNumber, charsRead;
 	socklen_t sizeOfClientInfo;
-	char enc_text[256];
-	char keygen[256];
+	char enc_text[MAX_CHAR];
+	char keygen[MAX_CHAR];
 	struct sockaddr_in serverAddress, clientAddress;
 
 	if (argc < 2) { fprintf(stderr,"USAGE: %s port\n", argv[0]); exit(1); } // Check usage & args
@@ -42,18 +46,18 @@ int main(int argc, char *argv[])
 	if (establishedConnectionFD < 0) error("ERROR on accept");
 
 	// Get the message from the client and display it
-	memset(keygen, '\0', 256);
-	charsRead = recv(establishedConnectionFD, keygen, 255, 0); // Read the client's message from the socket
+	memset(keygen, '\0', MAX_CHAR);
+	charsRead = recv(establishedConnectionFD, keygen, MAX_CHAR-1, 0); // Read the client's message from the socket
 	if (charsRead < 0) error("ERROR reading from socket");
 	printf("SERVER: I received this from the client: \"%s\"\n", keygen);
 
-	memset(enc_text, '\0', 256);
-	charsRead = recv(establishedConnectionFD, enc_text, 255, 0); // Read the client's message from the socket
+	memset(enc_text, '\0', MAX_CHAR);
+	charsRead = recv(establishedConnectionFD, enc_text, MAX_CHAR-1, 0); // Read the client's message from the socket
 	if (charsRead < 0) error("ERROR reading from socket");
 	printf("SERVER: I received this from the client: \"%s\"\n", enc_text);
 	// Send a Success message back to the client
 	// charsRead = send(establishedConnectionFD, "I am the server, and I got your message", 39, 0); // Send success back
-	// if (charsRead < 0) error("ERROR writing to socket");
+	if (charsRead < 0) error("ERROR writing to socket");
 	close(establishedConnectionFD); // Close the existing socket which is connected to the client
 	close(listenSocketFD); // Close the listening socket
 	return 0;
