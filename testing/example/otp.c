@@ -8,6 +8,7 @@
 
 #define MAX_CHAR 80000
 
+static const char BasicArray[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
 int main(int argc, char *argv[]){
   // lets work on otp here and see how it reacts
   char keygen[MAX_CHAR];
@@ -54,5 +55,64 @@ int main(int argc, char *argv[]){
   printf("Plain text value: %s\n", enc_text);
 
   // Lets encrypt it and see how that works out
+  // first we will contact all characters in keygen and plaintext to integer
+  //then we are going to add the keygen value from the Plaintext
+  // If a number is larger than 26, then the remainder, after subtraction of 26, is taken [as the result]. This simply means that if the computations "go past" Z, the sequence starts again at A.
+  //then we will mod 26
+  //we have the length of both strings
+  //lets setup an integer array for that
+  int keyintArray[keygenlen];
+  int encIntArray[enc_textlen];
+  int i=0;
+  int j=0;
+  for (i=0; i< keygenlen; i++){
+    keyintArray[i] = keygen[i];
+  }
+  for (i=0; i<enc_textlen; i++){
+    encIntArray[i] = enc_text[i];
+  }
+  // converted
+  printf("------------Encrypted Numbers ------------\n");
+  int EncryptIntarray[enc_textlen];
+  for (i=0; i<enc_textlen; i++){
+    int counter=0;
+    counter=encIntArray[i]+keyintArray[i];
+    EncryptIntarray[i]=((counter) % 26);
+    printf("Here is the number %d\n", EncryptIntarray[i]);
+  }
+  char EncryptedMessage[enc_textlen];
+  for (i=0; i<enc_textlen; i++){
+    EncryptedMessage[i]=BasicArray[EncryptIntarray[i]];
+    // sprintf(EncryptedMessage[i], "%d", EncryptIntarray[i]);
+    // printf("Here is each character that is encrypted %s\n", EncryptedMessage[i]);
+  }
 
+  printf("Here is the encrypted message %s\n", EncryptedMessage);
+// --------------------- Decryption -----------------
+// gotta a weird encrypted text but not sure if its right until I decrypt it
+  int decryptlen=strlen(EncryptedMessage);
+  int decryptIntArray[decryptlen];
+  for (i=0; i< decryptlen; i++){
+    decryptIntArray[i] = EncryptedMessage[i];
+  }
+  int DecryptIntArray2[decryptlen];
+printf("------------Decrypted Numbers ------------\n");
+  for (i=0; i<decryptlen; i++){
+    int counter=0;
+    counter=decryptIntArray[i]-keyintArray[i];
+    if (counter < 0){
+      counter+=26;
+    }
+      DecryptIntArray2[i]=counter;
+      printf("Here is the number %d\n", DecryptIntArray2[i]);
+  }
+  char DecryptedMessage[decryptlen];
+  for (i=0; i<decryptlen; i++){
+    DecryptedMessage[i] = BasicArray[DecryptIntArray2[i]];
+  }
+
+  printf("Here is the Decrypted message %s\n", DecryptedMessage);
+  //for decryption
+  // we will do the saame thing as encryption but we are going to subtract the keygen value from the plaintext
+  // Similar to the above, if a number is negative then 26 is added to make the number zero or higher.
 }
