@@ -29,9 +29,9 @@ int main(int argc, char *argv[])
 
 	// Set up the server address struct
   //Counter program
-	  printf("Argument counter normal file %s\n", argv[1]);
-		printf("Argument counter keyfile %s\n", argv[2]);
-  	printf("Argument counter port number:  %s\n", argv[3]);
+	  // printf("Argument counter normal file %s\n", argv[1]);
+		// printf("Argument counter keyfile %s\n", argv[2]);
+  	// printf("Argument counter port number:  %s\n", argv[3]);
 
 
 
@@ -40,17 +40,21 @@ int main(int argc, char *argv[])
   FILE* file_pointer = fopen(argv[2], "r");
   fgets(keygen, MAX_CHAR, file_pointer);
   fclose(file_pointer);
+	// printf("Here is the keygen key %s\n", keygen);
 	keygenlen=strlen(keygen);
+	// printf(" key size %d\n", keygenlen);
 // File for the plain text
   FILE* file_pointer2 = fopen(argv[1], "r");
   fgets(enc_text, MAX_CHAR, file_pointer2);
   fclose(file_pointer2);
 	enc_textlen=strlen(enc_text);
+	// printf(" Text size %d\n", enc_textlen);
 
 	if (keygenlen < enc_textlen){
 		printf("Error, key is shorter than the text to encrypt\n");
 		exit(1);
 	}
+	// check conditions for key and plain text 
 
 
 	memset((char*)&serverAddress, '\0', sizeof(serverAddress)); // Clear out the address struct
