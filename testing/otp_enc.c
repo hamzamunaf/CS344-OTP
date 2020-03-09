@@ -57,12 +57,15 @@ int main(int argc, char *argv[])
 		keygen[count] = charactercounter;
 		count++;
 	}
-  fclose(file_pointer);
-	// printf("H")
+	fclose(file_pointer);
+	//need to get rid off new line and put a "\0"
+	// this didn't works
+	keygen[strcspn(keygen, "\n")] = '\0';
+	// Keygen[count]='\0';
 
 
 	keygenlen=strlen(keygen);
-	printf(" key size %d\n", keygenlen);
+	printf(" key:  %s\n", keygen);
 // File for the plain text
   FILE* file_pointer2 = fopen(argv[1], "r");
   // fgets(enc_text, MAX_CHAR, file_pointer2);
@@ -79,9 +82,11 @@ int main(int argc, char *argv[])
 		enc_text[count] = charactercounter;
 		count++;
 	}
+	// enc_text[count]='\0';
   fclose(file_pointer2);
+	enc_text[strcspn(enc_text, "\n")] = '\0';
 	enc_textlen=strlen(enc_text);
-	printf(" Text size %d\n", enc_textlen);
+	printf(" Text:  %s\n", enc_text);
 // Note that the key passed in must be at least as big as the plaintext.
 	if (keygenlen < enc_textlen){
 		fprintf(stderr, "ERROR: Keygen is shorter than plain text\n");
