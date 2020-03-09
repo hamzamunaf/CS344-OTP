@@ -66,10 +66,19 @@ int main(int argc, char *argv[]){
   int i=0;
   int j=0;
   for (i=0; i< keygenlen; i++){
-    keyintArray[i] = keygen[i];
+    for(j=0; j<27; j++){
+      if (keygen[i] == BasicArray[j]){
+    keyintArray[i] = j;
+  }}
   }
-  for (i=0; i<enc_textlen; i++){
-    encIntArray[i] = enc_text[i];
+  // for (i=0; i<enc_textlen; i++){
+  //   encIntArray[i] = enc_text[i];
+  // }
+  for (i=0; i< enc_textlen; i++){
+    for(j=0; j<27; j++){
+      if (enc_text[i] == BasicArray[j]){
+        encIntArray[i]= j;
+  }}
   }
   // converted
   printf("------------Encrypted Numbers ------------\n");
@@ -77,7 +86,7 @@ int main(int argc, char *argv[]){
   for (i=0; i<enc_textlen; i++){
     int counter=0;
     counter=encIntArray[i]+keyintArray[i];
-    EncryptIntarray[i]=((counter) % 26);
+    EncryptIntarray[i]=((counter) % 27);
     printf("Here is the number %d\n", EncryptIntarray[i]);
   }
   char EncryptedMessage[enc_textlen];
@@ -92,8 +101,15 @@ int main(int argc, char *argv[]){
 // gotta a weird encrypted text but not sure if its right until I decrypt it
   int decryptlen=strlen(EncryptedMessage);
   int decryptIntArray[decryptlen];
+  // for (i=0; i< decryptlen; i++){
+  //   decryptIntArray[i] = EncryptedMessage[i];
+  // }
+
   for (i=0; i< decryptlen; i++){
-    decryptIntArray[i] = EncryptedMessage[i];
+    for(j=0; j<27; j++){
+      if (EncryptedMessage[i] == BasicArray[j]){
+    decryptIntArray[i] = j;
+  }}
   }
   int DecryptIntArray2[decryptlen];
 printf("------------Decrypted Numbers ------------\n");
@@ -101,7 +117,7 @@ printf("------------Decrypted Numbers ------------\n");
     int counter=0;
     counter=decryptIntArray[i]-keyintArray[i];
     if (counter < 0){
-      counter+=26;
+      counter+=27;
     }
       DecryptIntArray2[i]=counter;
       printf("Here is the number %d\n", DecryptIntArray2[i]);
@@ -110,7 +126,7 @@ printf("------------Decrypted Numbers ------------\n");
   for (i=0; i<decryptlen; i++){
     DecryptedMessage[i] = BasicArray[DecryptIntArray2[i]];
   }
-
+  DecryptedMessage[decryptlen] = '\0';
   printf("Here is the Decrypted message %s\n", DecryptedMessage);
   //for decryption
   // we will do the saame thing as encryption but we are going to subtract the keygen value from the plaintext
