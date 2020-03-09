@@ -7,12 +7,16 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <assert.h>
+#include <stdbool.h>
 
-
+//basic BasicArray
+static const char BasicArray[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
 // encryption for client
 #define MAX_CHAR 80000
+#define BASICLEN 28
 // otp_enc plaintext1 mykey 57171 > ciphertext1
 //otp_enc plaintext key port, need three arguments to make it work
+
 void error(const char *msg) { perror(msg); exit(0); } // Error function used for reporting issues
 
 int main(int argc, char *argv[])
@@ -24,8 +28,9 @@ int main(int argc, char *argv[])
   char enc_text[MAX_CHAR];
 	int keygenlen;
 	int enc_textlen;
+	int basicarraylen;
 
-	if (argc < 4) { fprintf(stderr,"USAGE: %s hostname port\n", argv[0]); exit(0); } // Check usage & args
+	if (argc < 4) { fprintf(stderr,"USAGE: %s hostname port\n", argv[3]); exit(0); } // Check usage & args
 
 	// Set up the server address struct
   //Counter program
@@ -36,25 +41,53 @@ int main(int argc, char *argv[])
 
 
 //File checking for key and will transfer key to see how it works
-//lets check length for key and file for comparison
+//lets check length for key and file for comparison and check all properties while reading
   FILE* file_pointer = fopen(argv[2], "r");
-  fgets(keygen, MAX_CHAR, file_pointer);
+  // fgets(keygen, MAX_CHAR, file_pointer);
+	char charactercounter;
+	int count = 0;
+	while((charactercounter = fgetc(file_pointer)) != EOF)
+	{
+		if(charactercounter > 32 && charactercounter < 65 && charactercounter < 90)
+		{
+			fprintf(stderr, "ERROR: Keygen file has invalid characters \n");
+			exit(1);
+		}
+
+		keygen[count] = charactercounter;
+		count++;
+	}
   fclose(file_pointer);
-	// printf("Here is the keygen key %s\n", keygen);
+	// printf("H")
+
+
 	keygenlen=strlen(keygen);
-	// printf(" key size %d\n", keygenlen);
+	printf(" key size %d\n", keygenlen);
 // File for the plain text
   FILE* file_pointer2 = fopen(argv[1], "r");
-  fgets(enc_text, MAX_CHAR, file_pointer2);
+  // fgets(enc_text, MAX_CHAR, file_pointer2);
+	charactercounter='\0';
+	count = 0;
+	while((charactercounter = fgetc(file_pointer2)) != EOF)
+	{
+		if(charactercounter > 32 && charactercounter < 65 && charactercounter < 90)
+		{
+			fprintf(stderr, "ERROR: Plaintext, file has invalid characters \n");
+			exit(1);
+		}
+
+		enc_text[count] = charactercounter;
+		count++;
+	}
   fclose(file_pointer2);
 	enc_textlen=strlen(enc_text);
-	// printf(" Text size %d\n", enc_textlen);
-
+	printf(" Text size %d\n", enc_textlen);
+// Note that the key passed in must be at least as big as the plaintext.
 	if (keygenlen < enc_textlen){
-		printf("Error, key is shorter than the text to encrypt\n");
+		fprintf(stderr, "ERROR: Keygen is shorter than plain text\n");
 		exit(1);
 	}
-	// check conditions for key and plain text 
+
 
 
 	memset((char*)&serverAddress, '\0', sizeof(serverAddress)); // Clear out the address struct
