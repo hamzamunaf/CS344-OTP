@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 
-static const char sourceArray[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
+static const char BasicArray[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
 
 int main (int argc, char* argv[]) {
 	int loopcounter;
@@ -17,7 +17,7 @@ int main (int argc, char* argv[]) {
 	loopcounter=0;
 	while ( loopcounter<lengthCounter ) {
 		int randm_value = rand() % 27;
-		char_keyValue[loopcounter] = sourceArray[randm_value];
+		char_keyValue[loopcounter] = BasicArray[randm_value];
 		loopcounter++;
 	}
 	// append end of character file
