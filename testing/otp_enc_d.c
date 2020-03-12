@@ -18,7 +18,7 @@ void error(const char *msg) { perror(msg); exit(1); } // Error function used for
 
 int main(int argc, char *argv[])
 {
-	int listenSocketFD, establishedConnectionFD, portNumber, charsRead;
+	int listenSocketFD, establishedConnectionFD, portNumber, charsRead, charsWritten;
 	socklen_t sizeOfClientInfo;
 	int keygenlen=0;
 	int plain_textlen=0;
@@ -90,13 +90,6 @@ int main(int argc, char *argv[])
 	// FILE *fptr1 = fopen("KeygenPlaintext", "wb");
 	// fprintf(fptr1, "%s\n", keygen);
 	// fclose(fptr1);
-
-	// printf("Got this much from client keygen : %d\n", strlen(keygen));
- // Read the client's message from the socket
-	// if (charsRead < 0) error("ERROR reading from socket");
-	// printf("SERVER: I received this from the client: \"%s\"\n", keygen);
-
-
 	// recieving plaintext
 	char plain_text[plain_textlen];
 	memset(plain_text, '\0', plain_textlen);
@@ -118,13 +111,54 @@ int main(int argc, char *argv[])
 	// printf("I got this much message %s\n", strlen(plain_text));
 	// printf("SERVER: I received this from the client: \"%d\"\n", strlen(plain_text));
 	if (strlen(plain_text) != plain_textlen){
-		printf("ERRORRRRR\n");
+			error("Something is wrong, plaintext was not recieved properly");
 	}
-	// just for checking
-	// FILE *fptr = fopen("daemonPlaintext", "wb");
-	// fprintf(fptr, "%s\n", plain_text);
-	// fclose(fptr);
+	char Encrypted_text[plain_textlen];
+	memset(Encrypted_text, '\0', plain_textlen);
+	//lets encrypted it
+	int keyintArray[keygenlen]; //converting key to int
+	int plaintextArray[plain_textlen]; //converting plaintext to int
+	int i=0;
+	int j=0;
+	for (i=0; i<keygenlen; i++){
+		for (j=0; j<strlen(BasicArray); j++){
+			if (keygen[i] == BasicArray[j])
+			keyintArray[i] = j;
+		}
+	}
+	for (i=0; i<plain_textlen; i++){
+		for (j=0; j<strlen(BasicArray); j++){
+			if (plain_text[i] == BasicArray[j])
+				plaintextArray[i] = j;
+		}
+	}
+	int EncryptedTextArray[plain_textlen];
+	for (i=0; i<plain_textlen; i++){
+		int messagekey=0;
+		messagekey=plaintextArray[i]+keyintArray[i];
+		EncryptedTextArray[i] = (messagekey % 27);
+	}
+	for (i=0; i<plain_textlen; i++){
+		Encrypted_text[i]=BasicArray[EncryptedTextArray[i]];
+	}
+	//sending encrypted Text length
+	int encryptedtextlen = strlen(Encrypted_text);
+	int converted_number=htonl(encryptedtextlen);
+	charsWritten = send(establishedConnectionFD, &converted_number, sizeof(converted_number), 0); // Write to the server
+	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
+	if (charsWritten < sizeof(converted_number)) printf("CLIENT: WARNING: Not all data written to socket!\n");
 
+
+	charsWritten = send(establishedConnectionFD, Encrypted_text, encryptedtextlen, 0); // Write to the server
+	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
+	if (charsWritten < sizeof(converted_number)) printf("CLIENT: WARNING: Not all data written to socket!\n");
+	//lets send the encrypted text
+	// printf("length of encrypted Message %d\n", strlen(Encrypted_text));
+	// FILE *fptr1 = fopen("EncryptedText", "wb");
+	// fprintf(fptr1, "%s\n", Encrypted_text);
+	// fclose(fptr1);
+
+	//lets send it back to our client
 
 	close(establishedConnectionFD); // Close the existing socket which is connected to the client
 	close(listenSocketFD); // Close the listening socket
