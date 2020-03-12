@@ -58,9 +58,6 @@ int main(int argc, char *argv[])
   printf("SERVER: I received this from the client: \"%d\"\n", ntohl(received_int));
   keygenlen=htonl(received_int);
 
-
-
-
   received_int = 0;
   // reciving Ciphertext length
   charsRead = recv(establishedConnectionFD, &received_int, sizeof(received_int), 0); // Read the client's message from the socket
@@ -68,7 +65,86 @@ int main(int argc, char *argv[])
   printf("SERVER: I received this from the client: \"%d\"\n", ntohl(received_int));
   cipher_textlen=htonl(received_int);
 
+	char keygen[keygenlen];
+	memset(keygen, '\0', keygenlen);
+	//lets get the keygen
+	charsRead=0;
+	int readBytes=0;
+	int countbytes=0;
+	int bytesRemain=keygenlen;
+	while (readBytes != keygenlen){
+		charsRead = recv(establishedConnectionFD, keygen+readBytes, keygenlen, 0);
+		if (charsRead < 0) error("ERRROR READING KEYGEN");
+			readBytes=readBytes+charsRead;
+		bytesRemain=keygenlen-readBytes;
+		// printf("Bytes reamining %d\n", bytesRemain);
+	}
+	// printf("Characters recieevd %d\n", strlen(keygen));
+	//properly recieved keygen
 
+	//lets recieve cipher Text
+	char cipher_text[cipher_textlen];
+	memset(cipher_text, '\0', cipher_textlen);
+	charsRead=0;
+ 	readBytes=0; //how much data was read
+ 	countbytes=0; //how much data is left to read
+ 	bytesRemain=cipher_textlen; //total length of the bytes that supposed to be read
+	while (readBytes != cipher_textlen){
+		charsRead = recv(establishedConnectionFD, cipher_text+readBytes, bytesRemain, 0);
+		if (charsRead < 0) error("ERROR reading from socket");
+			bytesRemain=cipher_textlen-readBytes;
+			readBytes=readBytes+charsRead;
+			// countbytes=strlen(plain_text);
+			// printf("Bytes remaining %d\n", bytesRemain);
+			// if (bytesRemain == 0){
+			// 	break;
+			// }
+	}
+	printf("Cipher text %s\n", cipher_text);
+	printf("Length of keygen %d\n", keygenlen);
+	printf("Length of Cipher text %d\n", cipher_textlen);
+	int keyintArray[keygenlen]; //converting key to int
+	int decryptlen=strlen(cipher_text);
+	  printf("Decryptedd message length : %d\n", decryptlen);
+	int decryptIntArray[decryptlen]; //converting plaintext to int
+	int i=0;
+	int j=0;
+	for (i=0; i<keygenlen; i++){
+		for (j=0; j<27; j++){
+			if (keygen[i] == BasicArray[j]){
+			keyintArray[i] = j;
+		}
+		}
+	}
+
+
+	for (i=0; i< decryptlen; i++){
+    for(j=0; j<27; j++){
+      if (cipher_text[i] == BasicArray[j]){
+    decryptIntArray[i] = j;
+  }}
+  }
+  int DecryptIntArray2[decryptlen];
+	for (i=0; i<decryptlen; i++){
+    int counter=0;
+    counter=decryptIntArray[i]-keyintArray[i];
+    if (counter < 0){
+      counter+=27;
+    }
+      DecryptIntArray2[i]=counter;
+      // printf("Here is the number %d\n", i);
+  }
+	char DecryptedMessage[decryptlen];
+	memset(DecryptedMessage, '\0', decryptlen);
+	// printf("length of the int decrypted Text array %d\n", strlen(DecryptedTextArray));
+	printf("-------Converting back to char =----------- \n");
+	for (i=0; i<decryptlen; i++){
+    DecryptedMessage[i] = BasicArray[DecryptIntArray2[i]];
+		// printf("Here is the number %d\n", i);
+  }
+	 // DecryptedMessage[decryptlen] = '\0';
+	 printf("Here is the length fo Decrypted Message %s\n", DecryptedMessage);
+	  // printf("Here is the Decrypted message %s\n", DecryptedMessage);
   close(establishedConnectionFD); // Close the existing socket which is connected to the client
   close(listenSocketFD); // Close the listening socket
   return 0;
