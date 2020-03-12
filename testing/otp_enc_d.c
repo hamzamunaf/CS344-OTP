@@ -9,7 +9,7 @@
 static const char BasicArray[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
 // encryption for client
 #define MAX_CHAR 80000
-#define BASICLEN 28
+#define BASICLEN 27
 // daemon server for encryption
 // This child process of otp_enc_d must first check to make sure it is communicating with otp_enc (see otp_enc, below). After verifying that the connection to otp_enc_d is coming from otp_enc, then this child receives from otp_enc plaintext and a key via the communication socket (not the original listen socket). The otp_enc_d child will then write back the ciphertext to the otp_enc process that it is connected to via the same communication socket. Note that the key passed in must be at least as big as the plaintext.
 //There are two ways we can recive the message from the client either I get the size of mesage and recieve the message or I can break it into two different things
@@ -117,26 +117,26 @@ int main(int argc, char *argv[])
 	memset(Encrypted_text, '\0', plain_textlen);
 	//lets encrypted it
 	int keyintArray[keygenlen]; //converting key to int
-	int plaintextArray[plain_textlen]; //converting plaintext to int
+	int plaintIntArray[plain_textlen]; //converting plaintext to int
 	int i=0;
 	int j=0;
 	for (i=0; i<keygenlen; i++){
-		for (j=0; j<strlen(BasicArray); j++){
+		for (j=0; j<27; j++){
 			if (keygen[i] == BasicArray[j])
 			keyintArray[i] = j;
 		}
 	}
 	for (i=0; i<plain_textlen; i++){
-		for (j=0; j<strlen(BasicArray); j++){
+		for (j=0; j<27; j++){
 			if (plain_text[i] == BasicArray[j])
-				plaintextArray[i] = j;
+				plaintIntArray[i] = j;
 		}
 	}
 	int EncryptedTextArray[plain_textlen];
 	for (i=0; i<plain_textlen; i++){
 		int messagekey=0;
-		messagekey=plaintextArray[i]+keyintArray[i];
-		EncryptedTextArray[i] = (messagekey % 27);
+		messagekey=plaintIntArray[i]+keyintArray[i];
+		EncryptedTextArray[i] = ((messagekey) % 27);
 	}
 	for (i=0; i<plain_textlen; i++){
 		Encrypted_text[i]=BasicArray[EncryptedTextArray[i]];

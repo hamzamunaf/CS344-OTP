@@ -161,30 +161,18 @@ int main(int argc, char *argv[])
 			if (charsRead < 0) error("ERROR recieving the encrypted Message\n");
 			readBytes=readBytes+charsRead;
 			bytesRemain=encryptedMessageLen-readBytes;
-			printf("Bytes remaining %d\n", bytesRemain);
+			// printf("Bytes remaining %d\n", bytesRemain);
 	}
 	//lets see what we recieved;
 	if (strlen(encryptedMessage) != encryptedMessageLen){
 		error("error encrypted message not recieved perfectly\n");
 	}
 	// printf("length of encrypted Message %d\n", strlen(Encrypted_text));
-	FILE *fptr1 = fopen("EncryptedText", "wb");
-	fprintf(fptr1, "%s\n", encryptedMessage);
-	fclose(fptr1);
-// perfectly recieevd
-	// //lets change how we send and recieving text and see what happens
-	// memset(EncryptedMessage, '\0', encryptedMessageLen); // Clear out the buffer again for reuse
- 	// count=0;
-	// int totallen = 0;
-	// while ((count = recv(socketFD, &EncryptedMessage[totallen], sizeof(EncryptedMessage) - count , 0)) > 0){
-	// 	totallen= totallen + count;
-	// }
-	// charsRead = recv(socketFD, EncryptedMessage, encryptedMessageLen, 0); // Read data from the socket, leaving \0 at end
-	// if (totallen < 0) error("CLIENT: ERROR reading from socket");
-	// printf("CLIENT: I received this from the server \n");
-	// printf("Characters i recieved %d\n", strlen(EncryptedMessage));
+	// FILE *fptr1 = fopen("EncryptedText", "wb");
+	// fprintf(fptr1, "%s\n", encryptedMessage);
+	// fclose(fptr1);
+	printf("%s\n", encryptedMessage);
 
-	// sleep(5);
 	close(socketFD); // Close the socket
 	return 0;
 }
