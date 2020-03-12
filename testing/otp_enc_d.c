@@ -86,6 +86,11 @@ int main(int argc, char *argv[])
 		bytesRemain=keygenlen-readBytes;
 		// printf("Bytes reamining %d\n", bytesRemain);
 	}
+	// just for checking
+	// FILE *fptr1 = fopen("KeygenPlaintext", "wb");
+	// fprintf(fptr1, "%s\n", keygen);
+	// fclose(fptr1);
+
 	// printf("Got this much from client keygen : %d\n", strlen(keygen));
  // Read the client's message from the socket
 	// if (charsRead < 0) error("ERROR reading from socket");
@@ -112,10 +117,14 @@ int main(int argc, char *argv[])
 	} // Read the client's message from the socket
 	// printf("I got this much message %s\n", strlen(plain_text));
 	// printf("SERVER: I received this from the client: \"%d\"\n", strlen(plain_text));
-	printf("%s\n", plain_text);
 	if (strlen(plain_text) != plain_textlen){
 		printf("ERRORRRRR\n");
 	}
+	// just for checking
+	// FILE *fptr = fopen("daemonPlaintext", "wb");
+	// fprintf(fptr, "%s\n", plain_text);
+	// fclose(fptr);
+
 
 	close(establishedConnectionFD); // Close the existing socket which is connected to the client
 	close(listenSocketFD); // Close the listening socket
