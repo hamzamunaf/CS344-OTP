@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 	int listenSocketFD, establishedConnectionFD, portNumber, charsRead, charsWritten;
 	socklen_t sizeOfClientInfo;
 	int keygenlen=0;
-	int plain_textlen=0;
+	int cipher_textlen=0;
 	char buffer[10000];
 	// char keygen[MAX_CHAR];
 	struct sockaddr_in serverAddress, clientAddress;
@@ -49,3 +49,17 @@ int main(int argc, char *argv[])
 	sizeOfClientInfo = sizeof(clientAddress); // Get the size of the address for the client that will connect
 	establishedConnectionFD = accept(listenSocketFD, (struct sockaddr *)&clientAddress, &sizeOfClientInfo); // Accept
 	if (establishedConnectionFD < 0) error("ERROR on accept");
+
+  int received_int = 0;
+
+  // reciving keygen length
+  charsRead = recv(establishedConnectionFD, &received_int, sizeof(received_int), 0); // Read the client's message from the socket
+  if (charsRead < 0) error("ERROR reading from socket");
+  printf("SERVER: I received this from the client: \"%d\"\n", ntohl(received_int));
+  keygenlen=htonl(received_int);
+
+
+  close(establishedConnectionFD); // Close the existing socket which is connected to the client
+  close(listenSocketFD); // Close the listening socket
+  return 0;
+}
