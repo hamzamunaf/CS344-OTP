@@ -129,13 +129,14 @@ int main(int argc, char *argv[])
 	if (charsWritten < sizeof(converted_number)) printf("CLIENT: WARNING: Not all data written to socket!\n");
 
 //sending keygen
+// printf("Sending this much keygen lenght %d\n", strlen(keygen));
 	charsWritten = send(socketFD, keygen, strlen(keygen), 0); // Write to the server
 	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
 	if (charsWritten < strlen(keygen)) printf("CLIENT: WARNING: Not all data written to socket!\n");
 
 
 //sending plain text
-printf("Sending this much character %d\n", strlen(plain_text));
+// printf("Sending this much character %d\n", strlen(plain_text));
 	charsWritten = send(socketFD, plain_text, strlen(plain_text), 0); // Write to the server
 	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
 	if (charsWritten < strlen(plain_text)) printf("CLIENT: WARNING: Not all data written to socket!\n");
