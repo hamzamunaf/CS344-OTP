@@ -106,11 +106,20 @@ int main(int argc, char *argv[])
   // Connect to server
   if (connect(socketFD, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) // Connect socket to address
   error("CLIENT: ERROR connecting");
+  //sending keygen len
   printf("Sending the length of keygen %d\n", keygenlen);
   int converted_number=htonl(keygenlen);
   charsWritten = send(socketFD, &converted_number, sizeof(converted_number), 0); // Write to the server
   if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
   if (charsWritten < sizeof(converted_number)) printf("CLIENT: WARNING: Not all data written to socket!\n");
+
+  //sending ciphertext length
+
+  converted_number=htonl(cipher_textlen);
+  charsWritten = send(socketFD, &converted_number, sizeof(converted_number), 0); // Write to the server
+  if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
+  if (charsWritten < sizeof(converted_number)) printf("CLIENT: WARNING: Not all data written to socket!\n");
+
 
   close(socketFD); // Close the socket
 	return 0;
