@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
   if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
   if (charsWritten < strlen(keygen)) printf("CLIENT: WARNING: Not all data written to socket!\n");
 
-  printf("Sending Cipher text length %d\n", strlen(cipher_text));
+  // printf("Sending Cipher text length %d\n", strlen(cipher_text));
   charsWritten = send(socketFD, cipher_text, strlen(cipher_text), 0); // Write to the server
   if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
   if (charsWritten < strlen(cipher_text)) printf("CLIENT: WARNING: Not all data written to socket!\n");

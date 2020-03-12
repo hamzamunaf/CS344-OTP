@@ -55,14 +55,14 @@ int main(int argc, char *argv[])
   // reciving keygen length
   charsRead = recv(establishedConnectionFD, &received_int, sizeof(received_int), 0); // Read the client's message from the socket
   if (charsRead < 0) error("ERROR reading from socket");
-  printf("SERVER: I received this from the client: \"%d\"\n", ntohl(received_int));
+  // printf("SERVER: I received this from the client: \"%d\"\n", ntohl(received_int));
   keygenlen=htonl(received_int);
 
   received_int = 0;
   // reciving Ciphertext length
   charsRead = recv(establishedConnectionFD, &received_int, sizeof(received_int), 0); // Read the client's message from the socket
   if (charsRead < 0) error("ERROR reading from socket");
-  printf("SERVER: I received this from the client: \"%d\"\n", ntohl(received_int));
+  // printf("SERVER: I received this from the client: \"%d\"\n", ntohl(received_int));
   cipher_textlen=htonl(received_int);
 
 	char keygen[keygenlen];
@@ -100,12 +100,12 @@ int main(int argc, char *argv[])
 			// 	break;
 			// }
 	}
-	printf("Cipher text %s\n", cipher_text);
-	printf("Length of keygen %d\n", keygenlen);
-	printf("Length of Cipher text %d\n", cipher_textlen);
+	// printf("Cipher text %s\n", cipher_text);
+	// printf("Length of keygen %d\n", keygenlen);
+	// printf("Length of Cipher text %d\n", cipher_textlen);
 	int keyintArray[keygenlen]; //converting key to int
 	int decryptlen=strlen(cipher_text);
-	  printf("Decryptedd message length : %d\n", decryptlen);
+	  // printf("Decryptedd message length : %d\n", decryptlen);
 	int decryptIntArray[decryptlen]; //converting plaintext to int
 	int i=0;
 	int j=0;
@@ -137,13 +137,17 @@ int main(int argc, char *argv[])
 	char DecryptedMessage[decryptlen];
 	memset(DecryptedMessage, '\0', decryptlen);
 	// printf("length of the int decrypted Text array %d\n", strlen(DecryptedTextArray));
-	printf("-------Converting back to char =----------- \n");
+	// printf("-------Converting back to char =----------- \n");
 	for (i=0; i<decryptlen; i++){
     DecryptedMessage[i] = BasicArray[DecryptIntArray2[i]];
 		// printf("Here is the number %d\n", i);
   }
 	 // DecryptedMessage[decryptlen] = '\0';
-	 printf("Here is the length fo Decrypted Message %s\n", DecryptedMessage);
+	 // printf("Length of Decrypted Message %d\n", strlen(DecryptedMessage));
+	 // printf("%s\n", DecryptedMessage);
+	 FILE *fptr1 = fopen("decryptreturn", "wb");
+	 fprintf(fptr1, "%s\n",DecryptedMessage);
+	 fclose(fptr1);
 	  // printf("Here is the Decrypted message %s\n", DecryptedMessage);
   close(establishedConnectionFD); // Close the existing socket which is connected to the client
   close(listenSocketFD); // Close the listening socket
