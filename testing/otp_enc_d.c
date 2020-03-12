@@ -20,10 +20,11 @@ int main(int argc, char *argv[])
 {
 	int listenSocketFD, establishedConnectionFD, portNumber, charsRead;
 	socklen_t sizeOfClientInfo;
-	char enc_text[MAX_CHAR];
+	// char enc_text[MAX_CHAR];
 	int keygenlen=0;
 	int enc_textlen=0;
-	char keygen[MAX_CHAR];
+	char buffer[10000];
+	// char keygen[MAX_CHAR];
 	struct sockaddr_in serverAddress, clientAddress;
 
 	if (argc < 2) { fprintf(stderr,"USAGE: %s port\n", argv[0]); exit(1); } // Check usage & args
@@ -41,11 +42,8 @@ int main(int argc, char *argv[])
 
 	// Enable the socket to begin listening
 	if (bind(listenSocketFD, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0) // Connect socket to port
-		error("ERROR on binding");
+	error("ERROR on binding");
 	listen(listenSocketFD, 5); // Flip the socket on - it can now receive up to 5 connections
-
-
-
 
 
 	// Accept a connection, blocking if one is not available until one connects
@@ -57,34 +55,73 @@ int main(int argc, char *argv[])
 
 	int received_int = 0;
 
-	// return_status = read(client_socket, &received_int, sizeof(received_int));
-	// if (return_status > 0) {
-	// 	fprintf(stdout, "Received int = %d\n", ntohl(received_int));
-	// }
-
-
+	// reciving keygen length
 	charsRead = recv(establishedConnectionFD, &received_int, sizeof(received_int), 0); // Read the client's message from the socket
 	if (charsRead < 0) error("ERROR reading from socket");
 	// printf("SERVER: I received this from the client: \"%d\"\n", ntohl(received_int));
 	keygenlen=htonl(received_int);
 	// printf("Keygen length is %d\n", keygenlen);
 
+
+	// recieving plaintext length
 	received_int=0;
 	charsRead = recv(establishedConnectionFD, &received_int, sizeof(received_int), 0); // Read the client's message from the socket
 	if (charsRead < 0) error("ERROR reading from socket");
 	// printf("SERVER: I received this from the client: \"%d\"\n", ntohl(received_int));
 	enc_textlen=htonl(received_int);
-	// printf("encrypted text length is %d\n", enc_textlen);
+	printf("encrypted text length is %d\n", enc_textlen);
 	// Get the message from the client and display it
-	memset(keygen, '\0', keygenlen);
-	charsRead = recv(establishedConnectionFD, keygen, keygenlen, 0); // Read the client's message from the socket
-	if (charsRead < 0) error("ERROR reading from socket");
-	printf("SERVER: I received this from the client: \"%s\"\n", keygen);
 
-	memset(enc_text, '\0', enc_textlen);
-	charsRead = recv(establishedConnectionFD, enc_text, enc_textlen, 0); // Read the client's message from the socket
+	// reciveing keygen
+	char keygen[keygenlen];
+	memset(keygen, '\0', keygenlen);
+	charsRead=0;
+	while (charsRead == 0){
+		charsRead = recv(establishedConnectionFD, keygen, keygenlen, 0);
+
+	} // Read the client's message from the socket
 	if (charsRead < 0) error("ERROR reading from socket");
-	printf("SERVER: I received this from the client: \"%s\"\n", enc_text);
+	// printf("SERVER: I received this from the client: \"%s\"\n", keygen);
+
+
+	// recieving plaintext
+	char enc_text[enc_textlen];
+	memset(enc_text, '\0', enc_textlen);
+	charsRead=0;
+	int readBytes=0; //how much data was read
+	int countbytes=0; //how much data is left to read
+	int bytesRemain=enc_textlen; //total length of the bytes that supposed to be read
+	while (readBytes != enc_textlen){
+		charsRead = recv(establishedConnectionFD, enc_text+readBytes, bytesRemain, 0);
+		if (charsRead < 0) error("ERROR reading from socket");
+			bytesRemain=enc_textlen-readBytes;
+			readBytes=readBytes+charsRead;
+			// countbytes=strlen(enc_text);
+			printf("Bytes remaining %d\n", bytesRemain);
+			if (bytesRemain == 0){
+				break;
+			}
+	} // Read the client's message from the socket
+	// printf("I got this much message %s\n", strlen(enc_text));
+	printf("SERVER: I received this from the client: \"%d\"\n", strlen(enc_text));
+	// printf("%s\n", enc_text);
+	if (strlen(enc_text) != enc_textlen){
+		printf("ERRORRRRR\n");
+	}
+
+	// sending encrypted text lenght
+	// int converted_number=htonl(enc_textlen);
+	// charsRead = send(establishedConnectionFD, &converted_number, sizeof(converted_number), 0); // Write to the server
+	// if (charsRead < 0) error("CLIENT: ERROR writing to socket");
+	// if (charsRead < sizeof(converted_number)) printf("CLIENT: WARNING: Not all data written to socket!\n");
+	// // sendering message back to client
+	//
+	// // sending encrypted message
+	// charsRead = send(establishedConnectionFD, enc_text, strlen(enc_text), 0); // Write to the server
+	// if (charsRead < 0) error("CLIENT: ERROR writing to socket");
+	// if (charsRead < strlen(enc_text)) printf("CLIENT: WARNING: Not all data written to socket!\n");
+	//
+	// printf("Server: I recieved this much length %d\n", strlen(enc_text));
 	// Send a Success message back to the client
 	// charsRead = send(establishedConnectionFD, "I am the server, and I got your message", 39, 0); // Send success back
 	if (charsRead < 0) error("ERROR writing to socket");
