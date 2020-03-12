@@ -59,6 +59,16 @@ int main(int argc, char *argv[])
   keygenlen=htonl(received_int);
 
 
+
+
+  received_int = 0;
+  // reciving Ciphertext length
+  charsRead = recv(establishedConnectionFD, &received_int, sizeof(received_int), 0); // Read the client's message from the socket
+  if (charsRead < 0) error("ERROR reading from socket");
+  printf("SERVER: I received this from the client: \"%d\"\n", ntohl(received_int));
+  cipher_textlen=htonl(received_int);
+
+
   close(establishedConnectionFD); // Close the existing socket which is connected to the client
   close(listenSocketFD); // Close the listening socket
   return 0;

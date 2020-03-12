@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
   if (charsWritten < sizeof(converted_number)) printf("CLIENT: WARNING: Not all data written to socket!\n");
 
   //sending ciphertext length
-
+  printf("sending cipher text len %d\n", cipher_textlen);
   converted_number=htonl(cipher_textlen);
   charsWritten = send(socketFD, &converted_number, sizeof(converted_number), 0); // Write to the server
   if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
