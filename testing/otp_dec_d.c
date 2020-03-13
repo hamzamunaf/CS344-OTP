@@ -44,11 +44,15 @@ int main(int argc, char *argv[])
 	error("ERROR on binding");
 	listen(listenSocketFD, 5); // Flip the socket on - it can now receive up to 5 connections
 
-
+	while(1){
 	// Accept a connection, blocking if one is not available until one connects
 	sizeOfClientInfo = sizeof(clientAddress); // Get the size of the address for the client that will connect
 	establishedConnectionFD = accept(listenSocketFD, (struct sockaddr *)&clientAddress, &sizeOfClientInfo); // Accept
 	if (establishedConnectionFD < 0) error("ERROR on accept");
+	printf("Server: Connected Client at Port %d\n", ntohs(clientAddress.sin_port));
+	// char decryptionDaemon[10];
+	// decryptionDaemon="Decryption";
+
 
   int received_int = 0;
 
@@ -65,7 +69,7 @@ int main(int argc, char *argv[])
   // printf("SERVER: I received this from the client: \"%d\"\n", ntohl(received_int));
   cipher_textlen=htonl(received_int);
 
-	char keygen[keygenlen];
+	char* keygen=malloc(keygenlen);
 	memset(keygen, '\0', keygenlen);
 	//lets get the keygen
 	charsRead=0;
@@ -83,7 +87,7 @@ int main(int argc, char *argv[])
 	//properly recieved keygen
 
 	//lets recieve cipher Text
-	char cipher_text[cipher_textlen];
+	char* cipher_text=malloc(cipher_textlen);
 	memset(cipher_text, '\0', cipher_textlen);
 	charsRead=0;
  	readBytes=0; //how much data was read
@@ -164,6 +168,7 @@ int main(int argc, char *argv[])
 
 	  // printf("Here is the Decrypted message %s\n", DecryptedMessage);
   close(establishedConnectionFD); // Close the existing socket which is connected to the client
+}
   close(listenSocketFD); // Close the listening socket
   return 0;
 }

@@ -23,6 +23,9 @@ int main(int argc, char *argv[])
 	int keygenlen=0;
 	int plain_textlen=0;
 	char buffer[10000];
+	int readBytes=0;
+	int countbytes=0;
+	int bytesRemain=0;
 	// char keygen[MAX_CHAR];
 	struct sockaddr_in serverAddress, clientAddress;
 
@@ -44,12 +47,12 @@ int main(int argc, char *argv[])
 	error("ERROR on binding");
 	listen(listenSocketFD, 5); // Flip the socket on - it can now receive up to 5 connections
 
-
+	while(1){
 	// Accept a connection, blocking if one is not available until one connects
 	sizeOfClientInfo = sizeof(clientAddress); // Get the size of the address for the client that will connect
 	establishedConnectionFD = accept(listenSocketFD, (struct sockaddr *)&clientAddress, &sizeOfClientInfo); // Accept
 	if (establishedConnectionFD < 0) error("ERROR on accept");
-
+	// printf("Server: Connected client at port %d\n", ntohs(clientAddress.sin_port));
 
 
 	int received_int = 0;
@@ -73,42 +76,44 @@ int main(int argc, char *argv[])
 
 	// reciveing keygen
 	//lets do the same for keygen as we did to recieve plain_text
-	char keygen[keygenlen];
+	char* keygen=malloc(keygenlen);
 	memset(keygen, '\0', keygenlen);
 	charsRead=0;
 	int readBytes=0;
 	int countbytes=0;
 	int bytesRemain=keygenlen;
 	while (readBytes != keygenlen){
-		charsRead = recv(establishedConnectionFD, keygen+readBytes, keygenlen, 0);
+		charsRead = recv(establishedConnectionFD, keygen, bytesRemain, 0);
 		if (charsRead < 0) error("ERRROR READING KEYGEN");
 			readBytes=readBytes+charsRead;
-		bytesRemain=keygenlen-readBytes;
+			bytesRemain=keygenlen-readBytes;
 		// printf("Bytes reamining %d\n", bytesRemain);
 	}
+	printf("Keygen : %s\n", keygen);
 	// just for checking
 	// FILE *fptr1 = fopen("KeygenPlaintext", "wb");
 	// fprintf(fptr1, "%s\n", keygen);
 	// fclose(fptr1);
 	// recieving plaintext
-	char plain_text[plain_textlen];
+	char* plain_text=malloc(plain_textlen);
 	memset(plain_text, '\0', plain_textlen);
 	charsRead=0;
  	readBytes=0; //how much data was read
  	countbytes=0; //how much data is left to read
  	bytesRemain=plain_textlen; //total length of the bytes that supposed to be read
 	while (readBytes != plain_textlen){
-		charsRead = recv(establishedConnectionFD, plain_text+readBytes, bytesRemain, 0);
+		charsRead = recv(establishedConnectionFD, plain_text, bytesRemain, 0);
 		if (charsRead < 0) error("ERROR reading from socket");
+				readBytes=readBytes+charsRead;
 			bytesRemain=plain_textlen-readBytes;
-			readBytes=readBytes+charsRead;
+
 			// countbytes=strlen(plain_text);
 			// printf("Bytes remaining %d\n", bytesRemain);
 			// if (bytesRemain == 0){
 			// 	break;
 			// }
 	} // Read the client's message from the socket
-	// printf("I got this much message %s\n", strlen(plain_text));
+	printf("I got this plain message %s\n", plain_text);
 	// printf("SERVER: I received this from the client: \"%d\"\n", strlen(plain_text));
 	if (strlen(plain_text) != plain_textlen){
 			error("Something is wrong, plaintext was not recieved properly");
@@ -161,6 +166,7 @@ int main(int argc, char *argv[])
 	//lets send it back to our client
 
 	close(establishedConnectionFD); // Close the existing socket which is connected to the client
+}
 	close(listenSocketFD); // Close the listening socket
 	return 0;
 }

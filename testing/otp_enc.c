@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
 	//
 	// // Get return message from server
 	// //recieving encrypted text
-	char encryptedMessage[encryptedMessageLen];
+	char* encryptedMessage=malloc(encryptedMessageLen);
 	memset(encryptedMessage, '\0', encryptedMessageLen);
 	charsRead=0;
 	int readBytes=0;

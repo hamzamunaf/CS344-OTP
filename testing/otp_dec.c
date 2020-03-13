@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
   // printf("SERVER: I received this from the client: \"%d\"\n", ntohl(received_int));
   decryptlen=htonl(received_int);
   // printf("Recieved this length for decrypted message %d\n", decryptlen);
-  char DecryptedMessage[decryptlen];
+  char* DecryptedMessage=malloc(decryptlen);
   memset(DecryptedMessage, '\0', decryptlen);
   charsRead=0;
   int readBytes=0;
@@ -153,6 +153,7 @@ int main(int argc, char *argv[])
   }
   printf("%s\n", DecryptedMessage);
 
+  
   close(socketFD); // Close the socket
 	return 0;
 }
