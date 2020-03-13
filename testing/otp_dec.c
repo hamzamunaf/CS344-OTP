@@ -130,7 +130,28 @@ int main(int argc, char *argv[])
   if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
   if (charsWritten < strlen(cipher_text)) printf("CLIENT: WARNING: Not all data written to socket!\n");
 
-
+  int decryptlen=0;
+  int received_int = 0;
+  // reciving Ciphertext length
+  charsRead = recv(socketFD, &received_int, sizeof(received_int), 0); // Read the client's message from the socket
+  if (charsRead < 0) error("ERROR reading from socket");
+  // printf("SERVER: I received this from the client: \"%d\"\n", ntohl(received_int));
+  decryptlen=htonl(received_int);
+  // printf("Recieved this length for decrypted message %d\n", decryptlen);
+  char DecryptedMessage[decryptlen];
+  memset(DecryptedMessage, '\0', decryptlen);
+  charsRead=0;
+  int readBytes=0;
+  int countbytes=0;
+  int bytesRemain=decryptlen;
+  while (readBytes != decryptlen){
+    charsRead = recv(socketFD, DecryptedMessage+readBytes, decryptlen, 0);
+    if (charsRead < 0) error("ERRROR READING KEYGEN");
+      readBytes=readBytes+charsRead;
+      bytesRemain=decryptlen-readBytes;
+    // printf("Bytes reamining %d\n", bytesRemain);
+  }
+  printf("%s\n", DecryptedMessage);
 
   close(socketFD); // Close the socket
 	return 0;

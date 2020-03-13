@@ -145,9 +145,23 @@ int main(int argc, char *argv[])
 	 // DecryptedMessage[decryptlen] = '\0';
 	 // printf("Length of Decrypted Message %d\n", strlen(DecryptedMessage));
 	 // printf("%s\n", DecryptedMessage);
-	 FILE *fptr1 = fopen("decryptreturn", "wb");
-	 fprintf(fptr1, "%s\n",DecryptedMessage);
-	 fclose(fptr1);
+	 // FILE *fptr1 = fopen("decryptreturn", "wb");
+	 // fprintf(fptr1, "%s\n",DecryptedMessage);
+	 // fclose(fptr1);
+
+
+	 //lets send encrypted text elength
+	 // printf("Sending decrypted message length ; %d\n", decryptlen);
+	 int converted_number=htonl(decryptlen);
+	 charsWritten = send(establishedConnectionFD, &converted_number, sizeof(converted_number), 0);
+	 if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
+	 if (charsWritten < sizeof(converted_number)) error("CLIENT: WARNING: Not all data written to socket!\n");
+
+	 charsWritten = send(establishedConnectionFD, DecryptedMessage, sizeof(DecryptedMessage), 0);
+	 if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
+	 if (charsWritten < sizeof(converted_number)) error("CLIENT: WARNING: Not all data written to socket!\n");
+
+
 	  // printf("Here is the Decrypted message %s\n", DecryptedMessage);
   close(establishedConnectionFD); // Close the existing socket which is connected to the client
   close(listenSocketFD); // Close the listening socket
